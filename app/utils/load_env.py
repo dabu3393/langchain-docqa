@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 import os
 
-def load_api_key():
+def load_env():
     load_dotenv()
-    return os.getenv("OPENAI_API_KEY")
+    
+def get_api_key(key, default=None):
+    return os.getenv(key, default)

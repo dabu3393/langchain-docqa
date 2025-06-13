@@ -1,14 +1,9 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
-from dotenv import load_dotenv
-import os
+from utils.load_env import load_env
 
 # Load API key
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-
-if not api_key:
-    raise ValueError("OpenAI API key not found")
+load_env()
 
 # Set up LLM
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)

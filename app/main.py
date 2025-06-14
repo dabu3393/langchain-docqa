@@ -1,16 +1,13 @@
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-from utils.load_env import load_env
+from fastapi import FastAPI
+from pydantic import BaseModel
+from app.qa_chain import answer_question
 
-# Load API key
-load_env()
+app = FastAPI()
 
-# Set up LLM
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+class QuestionRequest(BaseModel):
+    question: str
+    k: int = 4
 
-# Send a message
-response = llm.invoke([
-    HumanMessage(content="What's a large language model?")
-])
-
-print("Response:\n", response.content)
+@app.post("/ask")
+def ask_question(payload: QuestionRequest):
+    return answer_question(payload.question, payload.k)

@@ -12,5 +12,12 @@ def load_document(file_path):
         loader = TextLoader(file_path)
     else:
         raise ValueError(f"Unsupported file format: {ext}")
+
+    documents = loader.load()
+
+    # Add metadata
+    source = Path(file_path).name
+    for doc in documents:
+        doc.metadata["source"] = source
     
-    return loader.load()
+    return documents

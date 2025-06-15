@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.qa_chain import answer_question
 from langchain_community.vectorstores import Chroma
@@ -15,6 +16,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 vectordb = Chroma(persist_directory="vector_store", embedding_function=OpenAIEmbeddings())
 

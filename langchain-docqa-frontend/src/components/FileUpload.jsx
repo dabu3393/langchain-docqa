@@ -74,14 +74,14 @@ export default function FileUpload() {
     >
       <BiCloudUpload className="mx-auto h-12 w-12 text-gray-400" />
       <h3 className="mt-4 text-lg font-medium text-gray-900">Drop files here or click to upload</h3>
-      <p className="mt-2 text-sm text-gray-500">PDF, DOCX, TXT files up to 10MB</p>
+      <p className="mt-2 text-sm text-gray-500">PDF, MD, TXT files up to 10MB</p>
 
       <input
         type="file"
         id="fileInput"
         className="hidden"
         onChange={handleFileSelect}
-        accept=".pdf,.docx,.txt"
+        accept=".pdf,.md,.txt"
       />
 
       {uploading && (

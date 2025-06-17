@@ -4,9 +4,9 @@ import VectorStoreManager from './components/VectorStoreManager'
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-200 flex">
       <div className="w-full max-w-7xl mx-auto">
-        <div className="grid grid-cols-10 gap-6 p-6">
+        <div className="grid grid-cols-10 gap-6 mt-6 p-6">
           {/* Left side (70%) */}
           <div className="col-span-7 bg-white rounded-lg shadow">
             {/* File Upload (top) */}

@@ -1,13 +1,45 @@
-from utils.load_env import load_env
+from app.utils.load_env import load_env
+from app.vector_store import get_vectordb
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
-from utils.file_loader import load_document
+from app.utils.file_loader import load_document
+from langsmith import traceable
 import os
 import argparse
 from pathlib import Path
 
 load_env()
+
+@traceable(name="Document Ingestion")
+def ingest_single_file(file_path):
+    filename = Path(file_path).name
+
+    vectordb = get_vectordb()
+
+    existing_docs = vectordb.similarity_search(" ", k=100)
+    already_ingested = any(doc.metadata.get("source") == filename for doc in existing_docs)
+    
+    if already_ingested:
+        print(f"File '{filename}' already exists in the vector store. Skipping ingestion.")
+        return "duplicate"
+    
+    try:
+        document = load_document(file_path)
+        splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+        chunks = splitter.split_documents(document)
+        for chunk in chunks:
+            chunk.metadata["source"] = filename
+
+        vectordb.add_documents(chunks)
+
+        return {
+            "filename": os.path.basename(file_path),
+            "chunks_added": len(chunks)
+        }
+    except Exception as e:
+        print(f"Failed to process {file_path}: {str(e)}")
+        return 0
 
 def ingest_documents_from_directory(directory_path):
     all_chunks = []
@@ -39,10 +71,8 @@ def main(directory):
         print("No chunks ingested. Exiting.")
         return
 
-    # Create embeddings
-    embeddings = OpenAIEmbeddings()
-    vectordb = Chroma.from_documents(chunks, embedding=embeddings, persist_directory="vector_store")
-    vectordb.persist()
+    vectordb = get_vectordb()
+    
     print(f"Vector store updated with {len(chunks)} total chunks.")
 
 

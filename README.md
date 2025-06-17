@@ -53,7 +53,9 @@ LangChain DocQA is an end-to-end document question-answering app powered by Fast
 
 See the app in action from start to finish in this short walkthrough:
 
-[![LangChain DocQA Video Demo](assets/project.png)](https://youtu.be/6EuDse0p2AI)
+<a href="https://www.youtube.com/watch?v=6EuDse0p2AI" target="_blank">
+  <img src="assets/project.png" alt="Demo Video" width="600"/>
+</a>
 
 > Upload a document → Ask a question → Get an instant AI-powered answer with source context.
 

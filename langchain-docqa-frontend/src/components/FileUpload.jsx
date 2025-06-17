@@ -5,31 +5,31 @@ export default function FileUpload() {
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
 
-  const handleDrop = async (e) => {
+  const handleDrop = async e => {
     e.preventDefault()
     setIsDragging(false)
-    
+
     const file = e.dataTransfer.files[0]
     if (file) {
       await handleFile(file)
     }
   }
 
-  const handleFile = async (file) => {
+  const handleFile = async file => {
     setUploading(true)
     try {
       const formData = new FormData()
       formData.append('file', file)
-      
+
       const res = await fetch('http://127.0.0.1:8000/upload', {
         method: 'POST',
         body: formData,
       })
-      
+
       if (!res.ok) {
         throw new Error('Upload failed')
       }
-      
+
       const data = await res.json()
       console.log('Upload successful:', data)
     } catch (error) {
@@ -39,7 +39,7 @@ export default function FileUpload() {
     }
   }
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault()
     setIsDragging(true)
   }
@@ -48,7 +48,7 @@ export default function FileUpload() {
     setIsDragging(false)
   }
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = e => {
     const file = e.target.files[0]
     if (file) {
       handleFile(file)
@@ -75,7 +75,7 @@ export default function FileUpload() {
       <BiCloudUpload className="mx-auto h-12 w-12 text-gray-400" />
       <h3 className="mt-4 text-lg font-medium text-gray-900">Drop files here or click to upload</h3>
       <p className="mt-2 text-sm text-gray-500">PDF, DOCX, TXT files up to 10MB</p>
-      
+
       <input
         type="file"
         id="fileInput"
@@ -83,7 +83,7 @@ export default function FileUpload() {
         onChange={handleFileSelect}
         accept=".pdf,.docx,.txt"
       />
-      
+
       {uploading && (
         <div className="mt-4">
           <div className="h-1 bg-blue-500 rounded-full w-1/2 mx-auto"></div>

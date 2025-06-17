@@ -1,11 +1,17 @@
-import pytest
-from pathlib import Path
-from fpdf import FPDF
-from app.main import active_connections
+"""Unit tests for file upload functionality."""
+
 from datetime import datetime
+from pathlib import Path
+
+import pytest
+from fpdf import FPDF
+
+from app.main import active_connections
+
 
 @pytest.mark.asyncio
 async def test_file_upload_success(client):
+    """Test file upload with success."""
     test_file_path = Path("tests/test_files/sample.pdf")
     test_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -17,27 +23,37 @@ async def test_file_upload_success(client):
     pdf.output(str(test_file_path))
 
     with test_file_path.open("rb") as f:
-        response = await client.post("/upload", files={"file": ("sample.pdf", f, "application/pdf")})
+        response = await client.post(
+            "/upload", files={"file": ("sample.pdf", f, "application/pdf")}
+        )
 
     assert response.status_code == 200
 
+
 @pytest.mark.asyncio
 async def test_file_upload_invalid_type(client):
+    """Test file upload with invalid file type."""
     test_file_path = Path("tests/test_files/invalid.exe")
     test_file_path.parent.mkdir(parents=True, exist_ok=True)
     test_file_path.write_text("This should not be allowed.")
 
     with test_file_path.open("rb") as f:
-        response = await client.post("/upload", files={"file": ("invalid.exe", f, "application/octet-stream")})
+        response = await client.post(
+            "/upload", files={"file": ("invalid.exe", f, "application/octet-stream")}
+        )
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "Only PDF, TXT, and Markdown files are supported."
+    assert (
+        response.json()["detail"] == "Only PDF, TXT, and Markdown files are supported."
+    )
+
 
 @pytest.mark.asyncio
 async def test_file_upload_duplicate(client):
+    """Test file upload with duplicate file."""
     test_file_path = Path("tests/test_files/sample.txt")
     test_file_path.parent.mkdir(parents=True, exist_ok=True)
-    test_file_path.write_text("This is a duplicate test file.")
+    test_file_path.write_text("This is a duplicate test file.", encoding="utf-8")
 
     # Upload once to ensure it's in the store
     with test_file_path.open("rb") as f:
@@ -45,19 +61,28 @@ async def test_file_upload_duplicate(client):
 
     # Upload again to trigger "duplicate"
     with test_file_path.open("rb") as f:
-        response = await client.post("/upload", files={"file": ("sample.txt", f, "text/plain")})
+        response = await client.post(
+            "/upload", files={"file": ("sample.txt", f, "text/plain")}
+        )
 
     assert response.status_code == 200
     assert "already exists" in response.json().get("message", "")
 
+
 @pytest.mark.asyncio
 async def test_websocket_notification_on_upload(monkeypatch, client):
+    """Test WebSocket notification during file upload."""
+
+    # pylint: disable=too-few-public-methods
     class FakeConnection:
+        """Mock WebSocket connection."""
+
         def __init__(self):
             self.called = False
             self.sent_data = None
 
         async def send_json(self, data):
+            """Mock send_json method."""
             self.called = True
             self.sent_data = data
 
@@ -72,7 +97,9 @@ async def test_websocket_notification_on_upload(monkeypatch, client):
         test_file_path.write_text("WebSocket test content.")
 
         with test_file_path.open("rb") as f:
-            response = await client.post("/upload", files={"file": (filename, f, "text/plain")})
+            response = await client.post(
+                "/upload", files={"file": (filename, f, "text/plain")}
+            )
 
         assert response.status_code == 200
         assert fake_connection.called, "WebSocket was not notified"

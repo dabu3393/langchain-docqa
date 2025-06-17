@@ -16,7 +16,7 @@ export default function VectorStoreManager() {
       console.log('WebSocket connection established')
     }
 
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       const data = JSON.parse(event.data)
       switch (data.type) {
         case 'file_updated':
@@ -32,7 +32,7 @@ export default function VectorStoreManager() {
       console.log('WebSocket connection closed')
     }
 
-    ws.onerror = (error) => {
+    ws.onerror = error => {
       console.error('WebSocket error:', error)
     }
 
@@ -58,44 +58,46 @@ export default function VectorStoreManager() {
 
   const handleReset = async () => {
     const confirmReset = window.confirm(
-      "⚠️ WARNING: This will completely reset the application.\n\n" +
-      "- All uploaded files will be deleted\n" +
-      "- The vector store will be cleared\n\n" +
-      "After pressing OK, you will need to manually restart both servers:\n" +
-      "1. Stop the backend server (Ctrl+C)\n" +
-      "2. Stop the frontend server (Ctrl+C)\n" +
-      "3. Restart both servers\n\n" +
-      "This action cannot be undone. Are you sure you want to continue?"
+      '⚠️ WARNING: This will completely reset the application.\n\n' +
+        '- All uploaded files will be deleted\n' +
+        '- The vector store will be cleared\n\n' +
+        'After pressing OK, you will need to manually restart both servers:\n' +
+        '1. Stop the backend server (Ctrl+C)\n' +
+        '2. Stop the frontend server (Ctrl+C)\n' +
+        '3. Restart both servers\n\n' +
+        'This action cannot be undone. Are you sure you want to continue?'
     )
     if (!confirmReset) return
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/fresh-start", {
-        method: "POST",
+      const res = await fetch('http://127.0.0.1:8000/fresh-start', {
+        method: 'POST',
       })
-      
+
       if (res.ok) {
         const data = await res.json()
-        alert(`Application has been reset.\n\n${data.instructions}\n\nPlease restart both servers now.`)
+        alert(
+          `Application has been reset.\n\n${data.instructions}\n\nPlease restart both servers now.`
+        )
       } else {
-        throw new Error("Failed to reset application")
+        throw new Error('Failed to reset application')
       }
     } catch (err) {
-      console.error("Failed to perform fresh start:", err)
-      alert("Failed to reset application. Please try again.")
+      console.error('Failed to perform fresh start:', err)
+      alert('Failed to reset application. Please try again.')
     }
   }
 
-  const getFileType = (filename) => {
-    const extension = filename.split('.').pop().toLowerCase();
+  const getFileType = filename => {
+    const extension = filename.split('.').pop().toLowerCase()
     const types = {
       pdf: 'PDF Document',
       docx: 'Word Document',
       txt: 'Text File',
-      md: 'Markdown Document'
-    };
-    return types[extension] || 'Unknown Document';
-  };
+      md: 'Markdown Document',
+    }
+    return types[extension] || 'Unknown Document'
+  }
 
   return (
     <div className="space-y-4">

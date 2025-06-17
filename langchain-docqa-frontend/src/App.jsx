@@ -13,7 +13,7 @@ function App() {
             <div className="p-6 border-b">
               <FileUpload />
             </div>
-            
+
             {/* Question Form (bottom) */}
             <div className="p-6">
               <QuestionForm />
